@@ -2,9 +2,10 @@
 
 module IFetch(
 input clk_i, reset,
-input branch_i,
-input [31:0] imme_i,
-output [31:0] instr_o
+input PCSrc_i,
+input [31:0] addr_i,
+output [31:0] instr_o,
+output [31:0] addr_o
     );
     reg [31:0] pc;
     RAM uram(.clk_ia(clk_i),.addra(pc),.douta(instr_o));
@@ -14,9 +15,9 @@ output [31:0] instr_o
         end
         else
         begin
-            case(branch_i)
+            case(PCSrc_i)
                 1'b1:begin
-                    pc <= pc + imme_i;
+                    pc <= pc + addr_i;
                     end
                 default:begin
                     pc <= pc + 4;
@@ -24,4 +25,5 @@ output [31:0] instr_o
             endcase
         end
     end
+    assign addr_o = pc;
 endmodule
