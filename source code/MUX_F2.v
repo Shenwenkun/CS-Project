@@ -22,7 +22,7 @@
 
 module MUX_F2(
 input [31:0] rdata2_i,ALUResult_i,data_i,
-input [1:0] ForwardA,
+input [1:0] ForwardB,
 output reg [31:0] rdata2_o
     );
     always@*begin
