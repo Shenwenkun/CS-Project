@@ -3,14 +3,14 @@
 module Decoder(
 input clk,regwrite,
 input [31:0] instr_i,wdata,
-output signed [31:0] imme_0,
-output [31:0] rdata1,rdata2
+output reg signed [31:0] imme_o,
+output reg [31:0] rdata1,rdata2
     );
 reg [31:0] register[31:0];
 reg [31:0]i;
 reg [4:0]rs1,rs2,rd;
     
-    always @(*) begin
+    always @(posedge clk) begin
         case(instr_i[6:0])
             7'b0110011:begin//R-type
                 i = 1;
@@ -69,8 +69,11 @@ reg [4:0]rs1,rs2,rd;
             end
         endcase
     end
-    assign imme_0=i;
-    assign rdata1=register[rs1];
-    assign rdata2=register[rs2];
+    
+    always @(negedge clk) begin
+        imme_o <= i;
+        rdata1 <= register[rs1];
+        rdata2 <= register[rs2];
+    end
 
 endmodule
