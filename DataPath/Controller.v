@@ -21,33 +21,38 @@
 
 
 module Controller(
-input [31:0]instruction,
+input [31:0]instruction,rst_n,
 output Branch_o, MemRead_o, MemToReg_o, MemWrite_o, ALUsrc_o, RegWrite_o,
 output reg [3:0] ALUControl_o
     );
-    assign MemRead_o=(instruction[6:0]==7'h03)? 1'b1:1'b0;
-    assign MemWrite_o=(instruction[6:0]==7'h23)? 1'b1:1'b0;
-    assign MemToReg_o=(instruction[6:0]==7'h03)? 1'b1:((instruction[6:0]==7'h33)?1'b0:1'bx);
-    assign ALUsrc_o=(instruction[6:0]==7'h03 || instruction[6:0]==7'h23)? 1'b1:1'b0;
-    assign RegWrite_o=(instruction[6:0]==7'h33 || instruction[6:0]==7'h03)? 1'b1:1'b0;
-    assign Branch_o=(instruction[6:0]==7'h63)? 1'b1:1'b0;
+    assign MemRead_o=(instruction[6:0]==7'h03&&rst_n==1'b0)? 1'b1:1'b0;
+    assign MemWrite_o=(instruction[6:0]==7'h23&&rst_n==1'b0)? 1'b1:1'b0;
+    assign MemToReg_o=(instruction[6:0]==7'h03&&rst_n==1'b0)? 1'b1:((instruction[6:0]==7'h33||rst_n==1'b1)?1'b0:1'bx);
+    assign ALUsrc_o=((instruction[6:0]==7'h03 || instruction[6:0]==7'h23)&&rst_n==1'b0)? 1'b1:1'b0;
+    assign RegWrite_o=((instruction[6:0]==7'h33 || instruction[6:0]==7'h03)&&rst_n==1'b0)? 1'b1:1'b0;
+    assign Branch_o=(instruction[6:0]==7'h63&&rst_n==1'b0)? 1'b1:1'b0;
     
     always@* begin
-        case(instruction[6:0])
-            7'h03,7'h23:ALUControl_o=4'b0010;
-            7'h63:ALUControl_o=4'b0110;
-            7'h33:begin
-                case(instruction[31:25])
-                    7'h20:ALUControl_o=4'b0110;
-                    7'h00:begin
-                        case(instruction[14:12])
-                            3'b000: ALUControl_o=4'b0010;
-                            3'b111: ALUControl_o=4'b0000;
-                            3'b110: ALUControl_o=4'b0001;
-                        endcase
-                    end
-                endcase
-            end
-        endcase
+        if (rst_n==1'b1)begin
+            ALUControl_o=4'b0000;
+        end
+        else begin
+            case(instruction[6:0])
+                7'h03,7'h23:ALUControl_o=4'b0010;
+                7'h63:ALUControl_o=4'b0110;
+                7'h33:begin
+                    case(instruction[31:25])
+                        7'h20:ALUControl_o=4'b0110;
+                        7'h00:begin
+                            case(instruction[14:12])
+                                3'b000: ALUControl_o=4'b0010;
+                                3'b111: ALUControl_o=4'b0000;
+                                3'b110: ALUControl_o=4'b0001;
+                            endcase
+                        end
+                    endcase
+                end
+            endcase
+        end
     end
 endmodule
