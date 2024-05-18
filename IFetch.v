@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
 module IFetch(
-input clk_i, reset,
+input clk_i, rst_n,
 input PCSrc_i,
 input [31:0] addr_i,
-output [31:0] instr_o,
-output [31:0] addr_o
+output reg [31:0] instr_o,
+output reg [31:0] addr_o
     );
     reg [31:0] pc;
-    RAM uram(.clk_ia(clk_i),.addra(pc),.douta(instr_o));
+    reg [31:0] instr;
+    RAM uram(.clk_ia(clk_i),.addra(pc),.douta(instr));
     always @(posedge clk_i) begin
-        if(reset)begin
+        if(rst_n)begin
             pc <= 0; //maybe this should be changed!!!!!
         end
-        else
-        begin
+        else begin
             case(PCSrc_i)
                 1'b1:begin
                     pc <= pc + addr_i;
@@ -25,5 +25,8 @@ output [31:0] addr_o
             endcase
         end
     end
-    assign addr_o = pc;
+    always @(negedge clk_i) begin
+        addr_o <= pc;
+        instr_o <= instr;
+    end
 endmodule
