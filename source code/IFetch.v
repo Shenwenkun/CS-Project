@@ -17,7 +17,7 @@ output reg [31:0] addr_o
         else begin
             case(PCSrc_i)
                 1'b1:begin
-                    pc <= pc + addr_i;
+                    pc <= addr_i;
                     end
                 default:begin
                     pc <= pc + 4;
