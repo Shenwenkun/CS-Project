@@ -22,7 +22,7 @@
 
 module EXMEM(
 input clk,rst_n,Zero_i,RegWrite_i,Branch_i,MemRead_i,MemWrite_i,MemtoReg_i,
-input [31:0] ALUResult_i,addr_jump_i,rdata2_i,addr_mem_i,
+input [31:0] ALUResult_i,imme_i,addr_i, rdata2_i,
 input [4:0] rd_i,
 output reg RegWrite_o,Branch_o,MemRead_o,MemWrite_o,MemtoReg_o,
 output reg [31:0] addr_jump_o,rdata2_o,ALUResult_o,addr_mem_o,
@@ -38,8 +38,8 @@ output reg [4:0] rd_o
             rd_o<=4'b0;
         end
         else begin
-            RegWrite<=RegWrite_i;Branch<=Branch_i;MemRead<=MemRead_i;MemWrite<=MemWrite_i;MemtoReg<=MemtoReg_i;
-            addr_jump<=addr_jump_i;rdata2<=rdata2_i;ALUResult<=ALUResult_i;addr_mem<=addr_mem_i;
+            RegWrite<=RegWrite_i;Branch<=Branch_i&Zero_i;MemRead<=MemRead_i;MemWrite<=MemWrite_i;MemtoReg<=MemtoReg_i;
+            addr_jump<=addr_i+imme_i;rdata2<=rdata2_i;ALUResult<=ALUResult_i;addr_mem<=ALUResult_i;
             rd<=rd_i;
         end
     end
