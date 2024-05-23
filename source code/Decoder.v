@@ -1,68 +1,83 @@
 `timescale 1ns / 1ps
-
 module Decoder(
-input clk,regwrite,
-input [31:0] instr_i,wdata,
-output reg signed [31:0] imme_o,
-output reg [31:0] rdata1,rdata2
+      input clk, rst,
+      input regWrite,
+      input [4:0] wrd,
+      input [31:0] inst,
+      input [31:0] writeData,
+      output reg [31:0] imm32,
+      output reg [31:0] rs1Data, rs2Data,
+      output reg [4:0] rd_o
     );
 reg [31:0] register[31:0];
 reg [31:0]i;
-reg [4:0]rs1,rs2,rd;
+reg [4:0]rs1,rs2;
     
-    always @(posedge clk) begin
-        case(instr_i[6:0])
-            7'b0110011:begin//R-type
-                i = 1;
-                rs1={instr_i[19:15]};
-                rs2={instr_i[24:20]};
-                rd={instr_i[11:7]};
+    always @(*) begin
+        if ( rst == 0 ) begin
+            for (i=0; i<32; i=i+1) begin
+                 register[i] = 0;
             end
-            7'b0010011:begin//I-type
-                i = {instr_i[31:20]};
-                rs1={instr_i[19:15]};
+        end
+    end
+
+    always @(posedge clk) begin
+        case(inst[6:0])
+            7'b0110011:begin//R-type
+                i = 0;
+                rs1={inst[19:15]};
+                rs2={inst[24:20]};
+                rd_o={inst[11:7]};
+            end
+            7'b0010011, 7'b0000011:begin//I-type
+                i[11:0] = inst[31:20];
+            	i[31:12] = {20{i[11]}};
+                rs1={inst[19:15]};
                 rs2=0;
-                rd={instr_i[11:7]};
+                rd_o={inst[11:7]};
             end
             7'b0100011:begin//S-type
-                i = {instr_i[31:25],instr_i[11:7]};
-                rs1={instr_i[19:15]};
-                rs2={instr_i[24:20]};
-                rd=0;
+                i[11:0] = {inst[31:25],inst[11:7]};
+		i[31:12] = {20{i[11]}};
+                rs1={inst[19:15]};
+                rs2={inst[24:20]};
+                rd_o=0;
             end
             7'b1100011:begin//B-type
-                i = {instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0};
-                rs1={instr_i[19:15]};
-                rs2={instr_i[24:20]};
-                rd=0;
+                i[12:0] = {inst[31],inst[7],inst[30:25],inst[11:8],1'b0};
+		i[31:13] = {19{i[12]}};
+                rs1={inst[19:15]};
+                rs2={inst[24:20]};
+                rd_o=0;
             end
             7'b0110111:begin//U-type
-                i = {instr_i[31:12],12'b0000_0000_0000};
+                i = {inst[31:12],12'b0000_0000_0000};
                 rs1=0;
                 rs2=0;
-                rd={instr_i[11:7]};
+                rd_o={inst[11:7]};
             end
             7'b1101111:begin//J-type
-                i = {instr_i[31],instr_i[19:12],instr_i[20],instr_i[30:21],1'b0};
+                i[20:0] = {inst[31],inst[19:12],inst[20],inst[30:21],1'b0};
+		i[31:21] = {11{i[20]}};
                 rs1=0;
                 rs2=0;
-                rd={instr_i[11:7]};
+                rd_o={inst[11:7]};
             end
             default:begin
                 i = 0;
                 rs1=0;
                 rs2=0;
-                rd=0;
+                rd_o=0;
             end
         endcase
     end
     
     always @(posedge clk)begin
-        case(regwrite)
+        case(regWrite)
             1'b1:begin
-                case(rd)
-                    5'b00000:register[rd]=0;
-                    default:register[rd]<=wdata;
+                case(wrd)
+                    5'b00000:register[wrd]=0;
+                    default:register[wrd]=writeData;
                 endcase
             end
             1'b0:begin
@@ -71,9 +86,9 @@ reg [4:0]rs1,rs2,rd;
     end
     
     always @(negedge clk) begin
-        imme_o <= i;
-        rdata1 <= register[rs1];
-        rdata2 <= register[rs2];
+        imm32 <= i;
+        rs1Data <= register[rs1];
+        rs2Data <= register[rs2];
     end
 
 endmodule
