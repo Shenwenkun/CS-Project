@@ -22,19 +22,23 @@
 
 module EXMEM(
 input clk,rst_n,Zero_i,RegWrite_i,Branch_i,MemRead_i,MemWrite_i,MemtoReg_i,
-input [31:0] ALUResult_i,imme_i,addr_i, rdata2_i,
+input [31:0] ALUResult_i,imme_i,
+input [13:0] addr_i,
+input [31:0] rdata2_i,
 input [4:0] rd_i,
 output reg RegWrite_o,Branch_o,MemRead_o,MemWrite_o,MemtoReg_o,
-output reg [31:0] addr_jump_o,rdata2_o,ALUResult_o,
+output reg [31:0] rdata2_o,ALUResult_o,
+output reg [13:0] addr_jump_o,
 output reg [4:0] rd_o
     );
     reg RegWrite,Branch,MemRead,MemWrite,MemtoReg;
-    reg [31:0] addr_jump,rdata2,ALUResult;
+    reg [13:0] addr_jump;
+    reg [31:0] rdata2,ALUResult;
     reg [4:0] rd;
     always@(posedge clk) begin
         if (rst_n==1'b1)begin
             RegWrite_o<=1'b0;Branch_o<=1'b0;MemRead_o<=1'b0;MemWrite_o<=1'b0;MemtoReg_o<=1'b0;
-            addr_jump_o<=32'b0;rdata2_o<=32'b0;ALUResult_o<=32'b0;
+            addr_jump_o<=14'b0;rdata2_o<=32'b0;ALUResult_o<=32'b0;
             rd_o<=4'b0;
         end
         else begin
@@ -47,7 +51,7 @@ output reg [4:0] rd_o
     always@(negedge clk) begin
         if (rst_n==1'b1)begin
             RegWrite_o<=1'b0;Branch_o<=1'b0;MemRead_o<=1'b0;MemWrite_o<=1'b0;MemtoReg_o<=1'b0;
-            addr_jump_o<=32'b0;rdata2_o<=32'b0;ALUResult_o<=32'b0;
+            addr_jump_o<=14'b0;rdata2_o<=32'b0;ALUResult_o<=32'b0;
             rd_o<=4'b0;
         end
         else begin

@@ -22,23 +22,27 @@
 
 module IDEX(
 input clk,rst_n,RegWrite_i,ALUSrc_i,Branch_i,MemRead_i,MemWrite_i,MemtoReg_i,
-input [31:0] imme_i,addr_i,rdata1_i,rdata2_i,
+input [31:0] imme_i,rdata1_i,rdata2_i,
+input [13:0] addr_i,
 input [4:0] rd_i,rs1_i, rs2_i,
 input [3:0]ALUControl_i,
-output reg [31:0] imme_o,addr_o,rdata1_o,rdata2_o,
+output reg [31:0] imme_o,
+output reg [13:0] addr_o,
+output reg [31:0] rdata1_o,rdata2_o,
 output reg [4:0] rd_o,rs1_o, rs2_o,
 output reg RegWrite_o,ALUSrc_o,Branch_o,MemRead_o,MemWrite_o,MemtoReg_o,
 output reg [3:0]ALUControl_o
     );
     reg RegWrite,ALUSrc,Branch,MemRead,MemWrite,MemtoReg;
-    reg [31:0] imme,addr,rdata1,rdata2;
+    reg [31:0] imme,rdata1,rdata2;
+    reg [13:0] addr;
     reg [4:0] rd, rs1, rs2;
     reg [3:0]ALUControl;
     
     always @(posedge clk)begin
         if(rst_n==1'b1) begin
             RegWrite_o<=1'b0;ALUSrc_o<=1'b0;Branch_o<=1'b0;MemRead_o<=1'b0;MemWrite_o<=1'b0;MemtoReg_o<=1'b0;
-            imme_o<=32'b0;addr_o<=32'b0;rdata1_o<=32'b0;rdata2_o<=32'b0;
+            imme_o<=32'b0;addr_o<=13'b0;rdata1_o<=32'b0;rdata2_o<=32'b0;
             rd_o<=5'b0;rs1 <= 5'b0;rs2 <= 5'b0;ALUControl_o<=4'b0;
         end
         else begin
@@ -51,7 +55,7 @@ output reg [3:0]ALUControl_o
     always @(negedge clk)begin
         if(rst_n==1'b1) begin
             RegWrite_o<=1'b0;ALUSrc_o<=1'b0;Branch_o<=1'b0;MemRead_o<=1'b0;MemWrite_o<=1'b0;MemtoReg_o<=1'b0;
-            imme_o<=32'b0;addr_o<=32'b0;rdata1_o<=32'b0;rdata2_o<=32'b0;
+            imme_o<=32'b0;addr_o<=13'b0;rdata1_o<=32'b0;rdata2_o<=32'b0;
             rd_o<=5'b0;rs1 <= 5'b0;rs2 <= 5'b0;ALUControl_o<=4'b0;
         end
         else begin

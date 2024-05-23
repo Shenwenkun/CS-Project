@@ -22,15 +22,18 @@
 
 module IFID(
 input clk, rst_n, 
-input [31:0] Instr_i, addr_i,
-output reg [31:0] Instr_o, addr_o
+input [31:0] Instr_i,
+input [13:0] addr_i,
+output reg [31:0] Instr_o,
+output reg [13:0] addr_o
     );
     
-    reg [31:0] Instr,addr;
+    reg [31:0] Instr;
+    reg [13:0] addr;
     always @(posedge clk)begin
         if (rst_n==1'b1)begin
             Instr_o<=32'b0;
-            addr_o<=32'b0;
+            addr_o<=14'b0;
         end
         else begin
             Instr <= Instr_i;
@@ -41,7 +44,7 @@ output reg [31:0] Instr_o, addr_o
     always @(negedge clk)begin
         if (rst_n==1'b1)begin
             Instr_o<=32'b0;
-            addr_o<=32'b0;
+            addr_o<=14'b0;
         end
         else begin
             Instr_o <= Instr;

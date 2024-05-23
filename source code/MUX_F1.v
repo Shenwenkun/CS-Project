@@ -28,9 +28,9 @@ output reg [31:0] rdata1_o
     
     always@*begin
        case(ForwardA)
-       2'b00: rdata1_o=rdata1_i;
-       2'b01:rdata1_o=data_i;
-       2'b10: rdata1_o=ALUResult_i;
+           2'b00: rdata1_o=rdata1_i;
+           2'b01:rdata1_o=data_i;
+           default: rdata1_o=ALUResult_i;//2'b10
        endcase
     end
     

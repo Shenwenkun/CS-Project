@@ -3,13 +3,13 @@
 module IFetch(
 input clk_i, rst_n,
 input PCSrc_i,
-input [31:0] addr_i,
+input [13:0] addr_i,
 output reg [31:0] instr_o,
-output reg [31:0] addr_o
+output reg [13:0] addr_o
     );
-    reg [31:0] pc;
-    reg [31:0] instr;
-    RAM uram(.clk_ia(clk_i),.addra(pc),.douta(instr));
+    reg [13:0] pc;
+    wire [31:0] instr;
+    ROM uram(.clka(clk_i),.addra(pc),.douta(instr));
     always @(posedge clk_i) begin
         if(rst_n)begin
             pc <= 0; //maybe this should be changed!!!!!
