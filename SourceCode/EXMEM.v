@@ -21,30 +21,47 @@
 
 
 module EXMEM(
-input rst_n,Zero_i,RegWrite_i,Branch_i,MemRead_i,MemWrite_i,MemtoReg_i,
+input clk,rst_n,Zero_i,RegWrite_i,Branch_i,MemRead_i,MemWrite_i,MemOrIoToReg_i,IoRead_i,IoWrite_i,
 input [31:0] ALUResult_i,imme_i,
 input [13:0] addr_i,
 input [31:0] rdata2_i,
 input [4:0] rd_i,
-output reg RegWrite_o,Branch_o,MemRead_o,MemWrite_o,MemtoReg_o,
+output reg RegWrite_o,Branch_o,MemRead_o,MemWrite_o,MemOrIoToReg_o,IoRead_o,IoWrite_o,
 output reg [31:0] rdata2_o,ALUResult_o,
 output reg [13:0] addr_jump_o,
 output reg [4:0] rd_o
     );
-    reg RegWrite,Branch,MemRead,MemWrite,MemtoReg;
+    reg RegWrite,Branch,MemRead,MemWrite,MemOrIoToReg,IoRead,IoWrite;
     reg [13:0] addr_jump;
     reg [31:0] rdata2,ALUResult;
     reg [4:0] rd;
-    always@* begin
+    always@(posedge clk) begin
         if (rst_n==1'b1)begin
-            RegWrite=1'b0;Branch=1'b0;MemRead=1'b0;MemWrite=1'b0;MemtoReg=1'b0;
-            addr_jump=14'b0;rdata2=32'b0;ALUResult=32'b0;
-            rd=4'b0;
+            RegWrite<=1'b0;Branch<=1'b0;MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
+            addr_jump<=14'b0;rdata2<=32'b0;ALUResult<=32'b0;
+            rd<=4'b0;
+            IoRead<=1'b0;IoWrite<=1'b0;
         end
         else begin
-            RegWrite=RegWrite_i;Branch=Branch_i&Zero_i;MemRead=MemRead_i;MemWrite=MemWrite_i;MemtoReg=MemtoReg_i;
-            addr_jump=addr_i+imme_i;rdata2=rdata2_i;ALUResult=ALUResult_i;
-            rd=rd_i;
+            RegWrite<=RegWrite_i;Branch<=Branch_i&Zero_i;MemRead<=MemRead_i;MemWrite<=MemWrite_i;MemOrIoToReg<=MemOrIoToReg_i;
+            addr_jump<=addr_i+imme_i;rdata2<=rdata2_i;ALUResult<=ALUResult_i;
+            rd<=rd_i;
+            IoRead<=IoRead_i;IoWrite<=IoWrite_i;
+        end
+    end
+    
+    always@(negedge clk) begin
+        if (rst_n==1'b1)begin
+            RegWrite<=1'b0;Branch<=1'b0;MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
+            addr_jump<=14'b0;rdata2<=32'b0;ALUResult<=32'b0;
+            rd<=4'b0;
+            IoRead<=1'b0;IoWrite<=1'b0;
+        end
+        else begin
+            RegWrite_o<=RegWrite;Branch_o<=Branch;MemRead_o<=MemRead;MemWrite_o<=MemWrite;MemOrIoToReg_o<=MemOrIoToReg;
+            addr_jump_o<=addr_jump;rdata2_o<=rdata2;ALUResult_o<=ALUResult;
+            rd_o<=rd;
+            IoRead_o<=IoRead;IoWrite_o<=IoWrite;
         end
     end
 endmodule
