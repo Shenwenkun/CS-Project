@@ -22,11 +22,11 @@
 
 module DataMemory(
 input clk,
-input MemRead, MemWrite,
+input IoWrite2_i, MemWrite_i,
 input [13:0] addr_i,
 input [31:0] wdata_m_i,
 output [31:0] rdata_m_o
     );
     
-    RAM udram(.clka(~clk), .wea(MemWrite), .addra(addr_i), .dina(wdata_m_i), .douta(rdata_m_o));
+    RAM udram(.clka(~clk), .wea(MemWrite_i||IoWrite2_i), .addra(addr_i), .dina(wdata_m_i), .douta(rdata_m_o));
 endmodule
