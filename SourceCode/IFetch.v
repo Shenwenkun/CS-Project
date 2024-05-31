@@ -24,7 +24,7 @@ input upg_done_i // 1 if program finished
     .wea (kickOff ? 1'b0 : upg_wen_i ),
     .addra (kickOff ? addr_i : upg_addr_i ),
     .dina (kickOff ? 32'h00000000 : upg_data_i ),
-    .douta (instr_o)
+    .douta (instr)
     );
 //    ROM uram(.clka(clk_i),.addra(pc),.douta(instr));
     always @(posedge clk_i) begin
@@ -43,7 +43,12 @@ input upg_done_i // 1 if program finished
         end
     end
     always @(negedge clk_i) begin
-        addr_o <= pc;
-        instr_o <= instr;
+        if(rst_n)begin
+            pc <= 0; //maybe this should be changed!!!!!
+        end
+        else begin
+            addr_o <= pc;
+            instr_o <= instr;
+        end
     end
 endmodule
