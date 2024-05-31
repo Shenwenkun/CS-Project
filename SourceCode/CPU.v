@@ -21,8 +21,7 @@
 
 
 module CPU(
-input clk, rst,
-//, confirm_i,
+input clk, rst,conf_i,
 input [15:0] rdata_from_io,
 output [31:0] data_to_io
     );
@@ -124,7 +123,7 @@ output [31:0] data_to_io
     DataMemory datamemory(cpuclk, IoWrite2, MemWrite2, addr3, rdata2_5, rdata_m);
     
     MemOrIo memorio(
-    cpuclk,
+    cpuclk,conf_i,
     MemRead2,MemWrite2,IoRead2,IoWrite2,ByteOrWord2,
     ALUResult2[13:0],addr3,
     rdata_m,rdata_io,rdata_m1,rdata2_4,rdata2_5

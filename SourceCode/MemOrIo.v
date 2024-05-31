@@ -21,9 +21,9 @@
 //input:MemRead_i,MemWrite_i,ioRead_i,ioWrite_i,addr_i,m_rdata_i,io_rdata_i,r_rdata_i
 //output:addr_o,r_wdata_o,write_data_o
 
-module MemOrIo(clk, MemRead_i, MemWrite_i, ioRead_i, ioWrite_i,ByteOrWord_i,addr_i, addr_o, m_rdata_i, io_rdata_i, r_wdata_o, r_rdata_i, write_data_o);
+module MemOrIo(clk,confirm_i, MemRead_i, MemWrite_i, ioRead_i, ioWrite_i,ByteOrWord_i,addr_i, addr_o, m_rdata_i, io_rdata_i, r_wdata_o, r_rdata_i, write_data_o);
 input clk;
-//input confirm_i;
+input confirm_i;
 input MemRead_i; // read memory, from EXMEM
 input MemWrite_i; // write memory, from EXMEM
 input ioRead_i; // read IO, from EXMEM
@@ -54,7 +54,7 @@ always @(posedge clk)begin
     MemRead<=MemRead_i;MemWrite<=MemWrite_i;ioRead<=ioRead_i;ioWrite<=ioWrite_i;
     addr<=addr_i;r_rdata<=r_rdata_i;
     io_rdata<=io_rdata_i;
-//    confirm<=confirm_i;
+    confirm<=confirm_i;
     case(ByteOrWord_i)
         2'b00:m_rdata<={{24{m_rdata_i[7]}},m_rdata_i[7:0]};
         2'b01:m_rdata<=m_rdata_i;
@@ -67,10 +67,10 @@ always @(negedge clk) begin
     //wirte_data could go to either memory or IO. where is it from?
 //        if(confirm==1'b1)begin
 //            addr_o <= 14'h3C80;
-//            write_data_o<=32'b1;
+//            write_data_o<=32'h00000001;
 //        end else begin
-            addr_o <= addr;
-            write_data_o <= r_rdata;
+            addr_o <=(confirm==1'b1)? 14'h3C80:addr;
+            write_data_o <=(confirm==1'b1)?32'h0: r_rdata;
 //        end
     end
     else begin
@@ -79,11 +79,11 @@ always @(negedge clk) begin
     if(ioRead==1'b1)begin
 //        if(confirm==1'b1)begin
 //            addr_o <= 14'h3C80;
-//            write_data_o<=32'b1;
+//            write_data_o<=32'h00000001;
 //        end else begin
-            addr_o <= 14'h3C70;
-            write_data_o <= io_rdata;
-            r_wdata_o <= io_rdata;
+            addr_o <= (confirm==1'b1)?14'h3C80:14'h3C70;
+            write_data_o <=(confirm==1'b1)?32'h00000001: io_rdata;
+            r_wdata_o <=(confirm==1'b1)?32'h00000001: io_rdata;
 //        end
     end
     if(MemRead==1'b1)begin
