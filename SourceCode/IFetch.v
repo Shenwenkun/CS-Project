@@ -20,7 +20,7 @@ input upg_done_i // 1 if program finished
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i );
 //   use a RAM, modify the name
     RAM_IF instmem (
-    .clka (kickOff ? clk_i : upg_clk_i ),
+    .clka (kickOff ? ~clk_i : ~upg_clk_i ),
     .wea (kickOff ? 1'b0 : upg_wen_i ),
     .addra (kickOff ? addr_i : upg_addr_i ),
     .dina (kickOff ? 32'h00000000 : upg_data_i ),

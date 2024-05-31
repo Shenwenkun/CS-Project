@@ -47,11 +47,18 @@ output tx //with constrain PIN T4
     // Generate UART Programmer reset signal
     reg upg_rst;
     always @ (posedge fpga_clk) begin
-        if (spg_bufg) upg_rst <= 0;
-        if (fpga_rst) upg_rst <= 1;
+        if (spg_bufg) begin
+            upg_rst <= 0;
+        end
+        else if (fpga_rst) begin
+            upg_rst <= 1;
+        end
+        else begin
+            upg_rst <= upg_rst;
+        end
     end
     //used for other modules which don't relate to UART
-    wire rst;
+    wire rst;// active high
     assign rst = fpga_rst | !upg_rst;
     
     
@@ -75,7 +82,7 @@ output tx //with constrain PIN T4
 
    CPU cpu(
    .cpuclk(cpuclk),
-   .rst(rst),
+   .rst(~rst), // rst is active low in CPU module
    .start(start),
    .upg_rst_i(upg_rst),
    .upg_clk_i(upg_clk_o),
