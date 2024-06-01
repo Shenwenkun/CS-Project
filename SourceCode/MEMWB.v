@@ -31,7 +31,7 @@ output reg [4:0]rd_o
     reg RegWrite;
     reg [31:0]wdata;
     reg [4:0]rd;
-    always@(posedge clk)begin
+    always@(posedge clk or posedge rst_n)begin
         if (rst_n==1'b1)begin
             RegWrite_o<=1'b0;
             wdata_o<=32'b0;
@@ -48,15 +48,8 @@ output reg [4:0]rd_o
     end
     
     always@(negedge clk)begin
-        if (rst_n==1'b1)begin
-            RegWrite_o<=1'b0;
-            wdata_o<=32'b0;
-            rd_o<=5'b0;
-        end
-        else begin
-            RegWrite_o<=RegWrite;
-            wdata_o<=wdata;
-            rd_o<=rd;
-        end
+        RegWrite_o<=RegWrite;
+        wdata_o<=wdata;
+        rd_o<=rd;
     end
 endmodule
