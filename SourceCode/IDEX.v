@@ -47,7 +47,7 @@ output reg [3:0]ALUControl_o
 //    reg [2:0]Compare;
 //    reg Jalr;
     
-    always @(posedge clk)begin
+    always @(posedge clk or posedge rst_n)begin
         if(rst_n==1'b1) begin
             RegWrite<=1'b0;ALUSrc<=1'b0;
             imme<=32'b0;addr<=13'b0;rdata1<=32'b0;rdata2<=32'b0;
@@ -63,16 +63,17 @@ output reg [3:0]ALUControl_o
     end
     
     always @(negedge clk)begin
-        if(rst_n==1'b1) begin
-            RegWrite<=1'b0;ALUSrc<=1'b0;
-            imme<=32'b0;addr<=13'b0;rdata1<=32'b0;rdata2<=32'b0;
-            rd<=5'b0;rs1 <= 5'b0;rs2 <= 5'b0;ALUControl<=4'b0;Shift<=2'b0;
-        end
-        else begin
-            RegWrite_o<=RegWrite;ALUSrc_o<=ALUSrc;
-            imme_o<=imme;addr_o<=addr;rdata1_o<=rdata1;rdata2_o<=rdata2;
-            rd_o<=rd;rs1_o<=rs1;rs2_o<=rs2;ALUControl_o<=ALUControl;
-            instr_o<=instr;Shift_o<=Shift;
-        end
+        RegWrite_o<=RegWrite;
+        ALUSrc_o<=ALUSrc;
+        imme_o<=imme;
+        addr_o<=addr;
+        rdata1_o<=rdata1;
+        rdata2_o<=rdata2;
+        rd_o<=rd;
+        rs1_o<=rs1;
+        rs2_o<=rs2;
+        ALUControl_o<=ALUControl;
+        instr_o<=instr;
+        Shift_o<=Shift;
     end
 endmodule
