@@ -6,12 +6,12 @@ module Decoder(
       input [4:0] wrd_i,
       input [31:0] instr_i,
       input [31:0] wdata_i,
-      input [13:0] addr_i,//µ±Ç°PC
+      input [13:0] addr_i,//å½“å‰PC
       output reg [31:0] imm32_o,
       output reg [31:0] rdata1_o, rdata2_o,
       output reg [4:0] rd_o,
       output reg [4:0] rs1_o, rs2_o,
-      output reg jump_o,//Îª1ÔòÇå¿ÕIFID
+      output reg jump_o,//ä¸º1åˆ™æ¸…ç©ºIFID
       output reg [13:0] addr_o
     );
     reg [31:0] register[31:0];
@@ -21,18 +21,13 @@ module Decoder(
     reg jump;
     reg [13:0] addr;
 
-    initial begin
-        for (j=0; j<32; j=j+1) begin
-             register[j] = 0;
-        end
-    end
-    always @(posedge clk) begin
+    always @(posedge clk or posedge rst_n) begin
         if ( rst_n == 1 ) begin
             for (j=0; j<32; j=j+1) begin
                  register[j] <= 0;
             end
-        end
-        else begin case(instr_i[6:0])
+        end else begin
+        case(instr_i[6:0])
             7'b0110011:begin//R-type
                 imme <= 0;
                 rs1<={instr_i[19:15]};
@@ -67,8 +62,8 @@ module Decoder(
             end
             7'b1100011:begin//B-type
                 imme<= {{19{instr_i[31]}},instr_i[31],instr_i[7],instr_i[30:25],instr_i[11:8],1'b0};
-                rs1<=0;//Ã»ÓÃÁË
-                rs2<=0;//Ã»ÓÃÁË
+                rs1<=0;//æ²¡ç”¨äº†
+                rs2<=0;//æ²¡ç”¨äº†
                 rd<=0;
                 case(instr_i[14:12])
                     3'b000: jump<=(register[{instr_i[19:15]}]-register[{instr_i[24:20]}] == 0)? 1'b1 : 1'b0;
@@ -92,7 +87,7 @@ module Decoder(
                 imme <= {{11{instr_i[31]}},instr_i[31],instr_i[19:12],instr_i[20],instr_i[30:21],1'b0};
                 rs1<=0;
                 rs2<=0;
-                rd<=5'b0;//ÉèÎª0£¬·ÀÖ¹Ğ´»Ø´íÎóÊı¾İ
+                rd<=5'b0;//è®¾ä¸º0ï¼Œé˜²æ­¢å†™å›é”™è¯¯æ•°æ®
                 register[instr_i[11:7]]=addr_i;
                 jump<=1'b1;
                 addr<={{11{instr_i[31]}},instr_i[31],instr_i[19:12],instr_i[20],instr_i[30:21],1'b0};
@@ -117,14 +112,6 @@ module Decoder(
     
     
     always @(negedge clk) begin
-        if(rst_n)begin
-            for (j=0; j<32; j=j+1) begin
-                 register[j] <= 0;
-            end
-            imme<=0;
-            rs1<=0;rs2<=0;rd<=0;
-            jump<=0;addr<=0;
-        end
         imm32_o <= imme;
         rdata1_o <= register[rs1];
         rdata2_o <= register[rs2];
