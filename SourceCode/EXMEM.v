@@ -39,7 +39,7 @@ output reg [1:0] ByteOrWord_o
     reg [31:0] rdata2,ALUResult;
     reg [4:0] rd;
     reg [1:0] ByteOrWord;
-    always@(posedge clk) begin
+    always@(posedge clk or posedge rst_n) begin
         if (rst_n==1'b1)begin
             RegWrite<=1'b0;MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
             rdata2<=32'b0;ALUResult<=32'b0;
@@ -62,19 +62,15 @@ output reg [1:0] ByteOrWord_o
     end
     
     always@(negedge clk) begin
-        if (rst_n==1'b1)begin
-            RegWrite<=1'b0;MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
-            rdata2<=32'b0;ALUResult<=32'b0;
-            rd<=4'b0;
-            IoRead<=1'b0;IoWrite<=1'b0;
-            ByteOrWord<=2'b0;
-        end
-        else begin
-            RegWrite_o<=RegWrite;MemRead_o<=MemRead;MemWrite_o<=MemWrite;MemOrIoToReg_o<=MemOrIoToReg;
-            rdata2_o<=rdata2;ALUResult_o<=ALUResult;
-            rd_o<=rd;
-            IoRead_o<=IoRead;IoWrite_o<=IoWrite;
-            ByteOrWord_o<=ByteOrWord;
-        end
+        RegWrite_o<=RegWrite;
+        MemRead_o<=MemRead;
+        MemWrite_o<=MemWrite;
+        MemOrIoToReg_o<=MemOrIoToReg;
+        rdata2_o<=rdata2;
+        ALUResult_o<=ALUResult;
+        rd_o<=rd;
+        IoRead_o<=IoRead;
+        IoWrite_o<=IoWrite;
+        ByteOrWord_o<=ByteOrWord;
     end
 endmodule
