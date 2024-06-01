@@ -26,6 +26,7 @@ reg rst_n;
 reg PCSrc;
 reg [13:0] addr_i;
 wire [31:0] instr;
+//wire [13:0] pc_o;
 wire [13:0] addr_o;
 
 IFetch tb0(clk,rst_n,PCSrc,addr_i,instr,addr_o);
@@ -35,8 +36,10 @@ rst_n=1'b0;
 PCSrc=1'b0;
 addr_i=14'b00000000000110;
 #10
+//rst_n=1'b1;
 clk=~clk;
 #10
+//rst_n=1'b0;
 clk=~clk;
 #10
 clk=~clk;
@@ -45,7 +48,10 @@ clk=~clk;
 PCSrc=1'b1;
 #10
 clk=~clk;
+PCSrc=1'b0;
 #10;
+clk=~clk;
+#10
 clk=~clk;
 #10
 $finish;
