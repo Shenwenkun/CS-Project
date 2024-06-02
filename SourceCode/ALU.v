@@ -22,26 +22,26 @@ output reg [5:0]Alu_resultHigh_o
     // sub:0110
     // and:0000
     // or: 0001
-    always @ (posedge clk) begin
+    always @ (*) begin
 //        Compare<=Compare_i;
         case( ALUControl_i)
             4'b0010:begin
-               ALUResult <= rdata1_i + operand2;
+               ALUResult = rdata1_i + operand2;
             end
             4'b0110: begin
 //                if(Compare_i[1]==1'b1)begin
 //                    ALUResult<= $unsigned(rdata1_i)-$unsigned(operand2);
 //                end else begin
-                    ALUResult <= rdata1_i - operand2;
+                    ALUResult = rdata1_i - operand2;
 //                end
             end
-            4'b0000: ALUResult <= rdata1_i & operand2;
-            4'b0001: ALUResult <= rdata1_i | operand2;
+            4'b0000: ALUResult = rdata1_i & operand2;
+            4'b0001: ALUResult = rdata1_i | operand2;
             default:begin
                 case(Shift_i)
-                    2'b11:ALUResult <= (rdata1_i<<operand2);
-                    2'b10:ALUResult <= (rdata1_i>>operand2);
-                    default:ALUResult <= 0;
+                    2'b11:ALUResult = (rdata1_i<<operand2);
+                    2'b10:ALUResult = (rdata1_i>>operand2);
+                    default:ALUResult = 0;
                 endcase
             end
         endcase

@@ -33,9 +33,9 @@ output reg [13:0] addr_o
     assign Instr=Instr_i;
     assign addr=addr_i;
     
-    always @(negedge clk or posedge rst_n)begin
+    always @(posedge clk or posedge rst_n)begin
         if (rst_n==1'b1 || jump_i==1'b1)begin
-            Instr_o<=32'b0;
+            Instr_o<=32'h00000033;
             addr_o<=14'b0;
         end
         else begin

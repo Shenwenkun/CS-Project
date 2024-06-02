@@ -1,7 +1,7 @@
 module CPU(
 input clk, rst,conf_i,
-input [15:0] rdata_from_io,
-output [31:0] data_to_io
+input [15:0] rdata_io,
+output [31:0] rdata2_5
     );
     wire cpuclk, PCSrc;
     wire rst_n;
@@ -24,23 +24,20 @@ output [31:0] data_to_io
     wire [3:0] ALUControl2;
     wire [1:0] forwardingA, forwardingB;
     wire [31:0] ALUResult1, ALUResult2;
-    wire zero;
     wire [31:0] rdata1_3, rdata2_3, rdata_m,rdata_m1;
-    wire MemRead3,MemWrite3, RegWrite3;
-    wire [31:0] rdata2_4,rdata2_5;
+    wire RegWrite3;
+    wire [31:0] rdata2_4;
     wire[4:0] rd3;
-    wire MemOrIoToReg4,RegWrite4;
+    wire RegWrite4;
     wire [4:0] rd4; 
     wire [5:0] Alu_resultHigh;
     wire IoRead1,IoWrite1,IoRead2,IoWrite2;
-    wire [15:0]rdata_io;//??????????????????
 //    wire LEDCtrl,SwitchCtrl,TubeCtrl;
 //    wire [15:0]ioread_data_switch;
     wire [13:0] addr3;
     wire [1:0] Shift1,Shift2;
     wire [1:0] ByteOrWord1,ByteOrWord2;
-    assign rdata_io=rdata_from_io;
-    assign data_to_io= rdata2_5;
+//    assign data_to_io= rdata2_5;
     Clock clock(
     .clk_in1(clk), 
     .clk_out1(cpuclk)
@@ -91,7 +88,7 @@ output [31:0] data_to_io
     RegWrite2, 
     MemRead1, MemWrite1, MemOrIoToReg1, IoRead1,IoWrite1,ByteOrWord1,
     ALUResult1, 
-    imme2, addr2, rdata2_3, rd2,
+    addr2, rdata2_3, rd2,
     RegWrite3,
     MemRead2, MemWrite2, MemOrIoToReg2, IoRead2,IoWrite2,
     rdata2_4, ALUResult2, rd3,ByteOrWord2
@@ -100,7 +97,7 @@ output [31:0] data_to_io
     DataMemory datamemory(cpuclk, IoWrite2, MemWrite2, addr3, rdata2_5, rdata_m);
 
     MemOrIo memorio(
-    cpuclk,conf_i,
+    cpuclk,rst_n,conf_i,
     MemRead2,MemWrite2,IoRead2,IoWrite2,ByteOrWord2,
     ALUResult2[13:0],addr3,
     rdata_m,rdata_io,rdata_m1,rdata2_4,rdata2_5

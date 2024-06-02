@@ -39,29 +39,43 @@ output reg [3:0]ALUControl_o
 //output reg Jalr_o
     );
     reg RegWrite,ALUSrc,Shift;
-    reg [31:0] imme,rdata1,rdata2,instr;
+    wire [31:0] imme,rdata1,rdata2;
+    reg [31:0]instr;
     reg [13:0] addr;
-    reg [4:0] rd, rs1, rs2;
+    wire [4:0] rd, rs1, rs2;
     reg [3:0]ALUControl;
 //    reg [2:0]Compare;
 //    reg Jalr;
-
-    always @(posedge clk or posedge rst_n)begin
+    assign rd=rd_i;
+    assign rs1=rs1_i;
+    assign rs2=rs2_i;
+    assign imme=imme_i;
+    assign rdata1=rdata1_i;
+    assign rdata2=rdata2_i;
+    always @(negedge clk or posedge rst_n)begin
         if(rst_n==1'b1) begin
             RegWrite<=1'b0;ALUSrc<=1'b0;
-            imme<=32'b0;addr<=13'b0;rdata1<=32'b0;rdata2<=32'b0;
-            rd<=5'b0;rs1 <= 5'b0;rs2 <= 5'b0;ALUControl<=4'b0;
-            instr<=32'b0;Shift<=2'b0;
+//            imme<=32'b0;
+            addr<=13'b0;
+//            rdata1<=32'b0;rdata2<=32'b0;
+//            rd<=5'b0;rs1 <= 5'b0;rs2 <= 5'b0;
+            ALUControl<=4'b0;
+            instr<=32'b0;
+            Shift<=2'b0;
         end
         else begin
             RegWrite<=RegWrite_i;ALUSrc<=ALUSrc_i;
-            imme<=imme_i;addr<=addr_i;rdata1<=rdata1_i;rdata2<=rdata2_i;
-            rd<=rd_i;rs1<=rs1_i;rs2<=rs2_i;ALUControl<=ALUControl_i;
-            instr<=instr_i;Shift<=Shift_i;
+//            imme<=imme_i;
+            addr<=addr_i;
+//            rdata1<=rdata1_i;rdata2<=rdata2_i;
+//            rd<=rd_i;rs1<=rs1_i;rs2<=rs2_i;
+            ALUControl<=ALUControl_i;
+            instr<=instr_i;
+            Shift<=Shift_i;
         end
     end
 
-    always @(negedge clk)begin
+    always @(posedge clk)begin
         RegWrite_o<=RegWrite;
         ALUSrc_o<=ALUSrc;
         imme_o<=imme;

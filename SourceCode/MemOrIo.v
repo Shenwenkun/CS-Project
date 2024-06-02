@@ -38,7 +38,8 @@ input[31:0] r_rdata_i; // data read from Decoder(register file)#### In pipeline 
 output reg[31:0] write_data_o; // data to memory or I/O£¨m_wdata, io_wdata£©
 
  
-reg MemRead,MemWrite,ioRead,ioWrite,confirm;
+reg MemRead,MemWrite,ioRead,ioWrite;
+//confirm;
 reg [13:0] addr;
 reg [31:0] m_rdata,r_rdata;
 reg [15:0] io_rdata;
@@ -47,12 +48,12 @@ always @(posedge clk or posedge rst_n)begin
         MemRead<=0;MemWrite<=0;ioRead<=0;ioWrite<=0;
         addr<=0;r_rdata<=0;
         io_rdata<=0;
-        confirm<=0;
+//        confirm<=0;
     end else begin
     MemRead<=MemRead_i;MemWrite<=MemWrite_i;ioRead<=ioRead_i;ioWrite<=ioWrite_i;
     addr<=addr_i;r_rdata<=r_rdata_i;
     io_rdata<=io_rdata_i;
-    confirm<=confirm_i;
+//    confirm<=confirm_i;
     case(ByteOrWord_i)
         2'b00:m_rdata<={{24{m_rdata_i[7]}},m_rdata_i[7:0]};
         2'b01:m_rdata<=m_rdata_i;
@@ -68,21 +69,21 @@ always @(negedge clk) begin
 //            addr_o <= 14'h3C80;
 //            write_data_o<=32'h00000001;
 //        end else begin
-            addr_o <=(confirm==1'b1)? 14'h3C80:addr;
-            write_data_o <=(confirm==1'b1)?32'h0: r_rdata;
+            addr_o <=(confirm_i==1'b1)? 14'h3C80:addr;
+            write_data_o <=(confirm_i==1'b1)?32'h0: r_rdata;
 //        end
     end
     else begin
-        write_data_o = 32'hZZZZZZZZ;
+        write_data_o = 32'h00000000;
     end
     if(ioRead==1'b1)begin
 //        if(confirm==1'b1)begin
 //            addr_o <= 14'h3C80;
 //            write_data_o<=32'h00000001;
 //        end else begin
-            addr_o <= (confirm==1'b1)?14'h3C80:14'h3C70;
-            write_data_o <=(confirm==1'b1)?32'h00000001: io_rdata;
-            r_wdata_o <=(confirm==1'b1)?32'h00000001: io_rdata;
+            addr_o <= (confirm_i==1'b1)?14'h3C80:14'h3C70;
+            write_data_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
+            r_wdata_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
 //        end
     end
     if(MemRead==1'b1)begin

@@ -33,7 +33,7 @@ module Decoder(
             end
             7'b1100011: begin
                 case(instr_i[14:12])
-                    3'b000: jump=(register[{instr_i[19:15]}]-register[{instr_i[24:20]}] == 0)? 1'b1 : 1'b0;
+                    3'b000: jump=(register[{instr_i[19:15]}]- register[{instr_i[24:20]}] == 0)? 1'b1 : 1'b0;
                     3'b001: jump=(register[{instr_i[19:15]}]-register[{instr_i[24:20]}] == 0)? 1'b0 : 1'b1;
                     3'b100: jump=(register[{instr_i[19:15]}]-register[{instr_i[24:20]}] < 0)? 1'b1 : 1'b0;
                     3'b110: jump=($unsigned(register[{instr_i[19:15]}])-$unsigned(register[{instr_i[24:20]}]) < 0)? 1'b1 : 1'b0;
