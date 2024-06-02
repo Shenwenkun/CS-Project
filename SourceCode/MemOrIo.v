@@ -30,65 +30,78 @@ input ioRead_i; // read IO, from EXMEM
 input ioWrite_i; // write IO, from EXMEM
 input [1:0] ByteOrWord_i;
 input[13:0] addr_i; // from EXMEM
-output reg [13:0] addr_o; // address to Data-Memory
+output [13:0] addr_o; // address to Data-Memory
 input[31:0] m_rdata_i; // data read from Data-Memory
 input[15:0] io_rdata_i; // data read from IO,16 bits
-output reg [31:0] r_wdata_o; // data to Decoder(register file)
+output [31:0] r_wdata_o; // data to Decoder(register file)
 input[31:0] r_rdata_i; // data read from Decoder(register file)#### In pipeline it should from EXMEM
-output reg[31:0] write_data_o; // data to memory or I/O£¨m_wdata, io_wdata£©
+output [31:0] write_data_o; // data to memory or I/O£¨m_wdata, io_wdata£©
 
+
+assign addr_o=(confirm_i==1'b0)?addr_i:14'h3C80;
+assign r_wdata_o=(MemRead_i==1'b1)?m_rdata_i:{{16{io_rdata_i[15]}},io_rdata_i};
+assign write_data_o=((MemWrite_i==1'b1||ioWrite_i==1'b1)?r_rdata_i:32'h00000000);
  
-reg MemRead,MemWrite,ioRead,ioWrite;
-//confirm;
-reg [13:0] addr;
-reg [31:0] m_rdata,r_rdata;
-reg [15:0] io_rdata;
-always @(posedge clk or posedge rst_n)begin
-    if(rst_n==1'b1)begin
-        MemRead<=0;MemWrite<=0;ioRead<=0;ioWrite<=0;
-        addr<=0;r_rdata<=0;
-        io_rdata<=0;
-//        confirm<=0;
-    end else begin
-    MemRead<=MemRead_i;MemWrite<=MemWrite_i;ioRead<=ioRead_i;ioWrite<=ioWrite_i;
-    addr<=addr_i;r_rdata<=r_rdata_i;
-    io_rdata<=io_rdata_i;
-//    confirm<=confirm_i;
-    case(ByteOrWord_i)
-        2'b00:m_rdata<={{24{m_rdata_i[7]}},m_rdata_i[7:0]};
-        2'b01:m_rdata<=m_rdata_i;
-        2'b10:m_rdata<={{24{1'b0}},m_rdata_i[7:0]};
-    endcase
-    end
-end
+//reg MemRead,MemWrite,ioRead,ioWrite;
+////confirm;
+////reg [13:0] addr;
+//reg [31:0] m_rdata,r_rdata;
+//reg [15:0] io_rdata;
+//always @(posedge clk or posedge rst_n)begin
+//    if(rst_n==1'b1)begin
+//        MemRead<=0;MemWrite<=0;ioRead<=0;ioWrite<=0;
+//        addr<=0;r_rdata<=0;
+//        io_rdata<=0;
+////        confirm<=0;
+//    end else begin
+//    MemRead<=MemRead_i;MemWrite<=MemWrite_i;ioRead<=ioRead_i;ioWrite<=ioWrite_i;
+//    addr<=addr_i;r_rdata<=r_rdata_i;
+//    io_rdata<=io_rdata_i;
+////    confirm<=confirm_i;
+//    case(ByteOrWord_i)
+//        2'b00:m_rdata<={{24{m_rdata_i[7]}},m_rdata_i[7:0]};
+//        2'b01:m_rdata<=m_rdata_i;
+//        2'b10:m_rdata<={{24{1'b0}},m_rdata_i[7:0]};
+//    endcase
+//    end
+//end
 
-always @(negedge clk) begin
-    if((MemWrite==1)||(ioWrite==1))begin
-    //wirte_data could go to either memory or IO. where is it from?
-//        if(confirm==1'b1)begin
-//            addr_o <= 14'h3C80;
-//            write_data_o<=32'h00000001;
-//        end else begin
-            addr_o <=(confirm_i==1'b1)? 14'h3C80:addr;
-            write_data_o <=(confirm_i==1'b1)?32'h0: r_rdata;
-//        end
-    end
-    else begin
-        write_data_o = 32'h00000000;
-    end
-    if(ioRead==1'b1)begin
-//        if(confirm==1'b1)begin
-//            addr_o <= 14'h3C80;
-//            write_data_o<=32'h00000001;
-//        end else begin
-            addr_o <= (confirm_i==1'b1)?14'h3C80:14'h3C70;
-            write_data_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
-            r_wdata_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
-//        end
-    end
-    if(MemRead==1'b1)begin
-        addr_o <= addr;
-        r_wdata_o <= m_rdata;
-    end
-end
+//always @(negedge clk) begin
+//    if((MemWrite==1))begin
+//    //wirte_data could go to either memory or IO. where is it from?
+////        if(confirm==1'b1)begin
+////            addr_o <= 14'h3C80;
+////            write_data_o<=32'h00000001;
+////        end else begin
+////            addr_o <=(confirm_i==1'b1)? 14'h3C80:addr;
+////            write_data_o <=(confirm_i==1'b1)?32'h0: r_rdata;
+//            addr_o<=addr;
+//            write_data_o<=r_rdata;
+////        end
+//    end
+//    else begin
+//        write_data_o = 32'h00000000;
+//    end
+//    if((ioWrite==1))begin
+//        addr_o<=addr;
+//        write_data_o<=io_rdata;
+//    end
+//    if(ioRead==1'b1)begin
+////        if(confirm==1'b1)begin
+////            addr_o <= 14'h3C80;
+////            write_data_o<=32'h00000001;
+////        end else begin
+////            addr_o <= (confirm_i==1'b1)?14'h3C80:14'h3C70;
+//            addr_o<=14'h3C70;
+////            write_data_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
+////            r_wdata_o <=(confirm_i==1'b1)?32'h00000001: io_rdata;
+//            r_wdata_o<=m_rdata;
+////        end
+//    end
+//    if(MemRead==1'b1)begin
+//        addr_o <= addr;
+//        r_wdata_o <= m_rdata;
+//    end
+//end
+//endmodule
 endmodule

@@ -28,5 +28,5 @@ input [31:0] wdata_m_i,
 output [31:0] rdata_m_o
     );
     
-    RAM udram(.clka(~clk), .wea(MemWrite_i||IoWrite2_i), .addra(addr_i), .dina(wdata_m_i), .douta(rdata_m_o));
+    RAM udram(.clka(~clk), .wea(MemWrite_i||IoWrite2_i||(addr_i==14'h3c80)), .addra(addr_i), .dina((addr_i==14'h3c80)?32'h1:wdata_m_i), .douta(rdata_m_o));
 endmodule
