@@ -28,23 +28,24 @@ output reg [31:0] Instr_o,
 output reg [13:0] addr_o
     );
     
-    reg [31:0] Instr;
-    reg [13:0] addr;
+    wire [31:0] Instr;
+    wire [13:0] addr;
+//    always @(negedge clk)begin
+//        if (rst_n==1'b1||jump_i==1'b1)begin
+//            Instr<=32'h00000000;
+//            addr<=14'h0000;
+//        end
+//        else begin
+//            Instr <= Instr_i;
+//            addr <= addr_i;
+//        end
+//    end
+    assign Instr=Instr_i;
+    assign addr=addr_i;
     always @(posedge clk)begin
         if (rst_n==1'b1||jump_i==1'b1)begin
-            Instr<=32'h00000000;
-            addr<=14'h0000;
-        end
-        else begin
-            Instr <= Instr_i;
-            addr <= addr_i;
-        end
-    end
-    
-    always @(negedge clk)begin
-        if (rst_n==1'b1||jump_i==1'b1)begin
-            Instr<=32'b0;
-            addr<=14'b0;
+            Instr_o <= 0;
+            addr_o <= 0;
         end
         else begin
             Instr_o <= Instr;
@@ -52,8 +53,8 @@ output reg [13:0] addr_o
         end
     end
     
-    always@(posedge jump_i)begin
-    Instr_o <= 0;
-    addr_o <= 0;
-    end
+//    always@(posedge jump_i)begin
+//    Instr_o <= 0;
+//    addr_o <= 0;
+//    end
 endmodule
