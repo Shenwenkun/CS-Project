@@ -22,7 +22,7 @@
 
 module CPU(
 input clk, rst,conf_i,
-input [15:0] rdata_from_io,
+input [15:0] rdata_io,
 output [31:0] data_to_io
     );
     wire cpuclk, PCSrc;
@@ -55,13 +55,13 @@ output [31:0] data_to_io
     wire [4:0] rd4; 
     wire [5:0] Alu_resultHigh;
     wire IoRead1,IoWrite1,IoRead2,IoWrite2;
-    wire [15:0]rdata_io;//拨码开关送来的数据
-//    wire LEDCtrl,SwitchCtrl,TubeCtrl;
-//    wire [15:0]ioread_data_switch;
     wire [13:0] addr3;
     wire [1:0] Shift1,Shift2;
     wire [1:0] ByteOrWord1,ByteOrWord2;
-    assign rdata_io=rdata_from_io;
+    wire [2:0] Compare1,Compare2;
+    wire J1,J2;
+    wire Jalr1,Jalr2;
+    wire Branch1,Branch2;
     assign data_to_io= rdata2_5;
     Clock clock(
     .clk_in1(clk), 
@@ -72,31 +72,28 @@ output [31:0] data_to_io
     
     IFID ifid(cpuclk, rst_n,PCSrc, instr0, addr0, instr1, addr1);
     
-    Decoder decoder(cpuclk, rst_n, RegWrite4, rd4, instr1, wdata,addr1, imme1, rdata1_1, rdata2_1, rd1, rs1_1, rs2_1,PCSrc,j_addr);
+    Decoder decoder(cpuclk, rst_n, RegWrite4, rd4, instr1, wdata,addr1, imme1, rdata1_1, rdata2_1, rd1, rs1_1, rs2_1);
     
-    //Controller controller(instr1, rst_n, Branch1, MemRead1, MemToReg1, MemWrite1, ALUSrc1, RegWrite1, ALUControl1);
     Controller controller(
     .instr_i(instr1),
-//    .Branch_o(Branch1),
-//    .MemRead_o(MemRead1),
-//    .MemToReg_o(MemToReg1),
-//    .MemWrite_o(MemWrite1),
     .ALUsrc_o(ALUSrc1), 
     .RegWrite_o(RegWrite1), 
     .Shift_o(Shift1),
-    .ALUControl_o(ALUControl1)
+    .ALUControl_o(ALUControl1),
+    .Compare_o(Compare1),
+    .J_o(J1),
+    .Jalr_o(Jalr1),
+    .Branch_o(Branch1)
     );
     
     IDEX idex(
     cpuclk,rst_n,
-    RegWrite1,ALUSrc1, Shift1,
-//    MemRead1, MemWrite1, MemToReg1, 
+    RegWrite1,ALUSrc1,Branch1,Jalr1, Shift1,Compare1,J1,
     imme1, rdata1_1, rdata2_1,instr1, addr1, rd1, rs1_1, rs2_1, 
     ALUControl1,
     imme2, addr2, rdata1_2, rdata2_2,instr2, rd2, rs1_2, rs2_2, 
-    RegWrite2, ALUSrc2, Shift2,
-//    MemRead2, MemWrite2, MemToReg2, 
-    ALUControl2
+    RegWrite2, ALUSrc2,Branch2, Shift2,
+    ALUControl2,Compare2,J2,Jalr2
     );
 
     ForwardingUnit forwardingunit(RegWrite4, RegWrite3, rst_n, rd4, rd3, rs1_2, rs2_2, forwardingA, forwardingB);
@@ -112,26 +109,23 @@ output [31:0] data_to_io
     EXMEM exmem(
     cpuclk, rst_n, 
     RegWrite2, 
-    MemRead1, MemWrite1, MemOrIoToReg1, IoRead1,IoWrite1,ByteOrWord1,
+    MemRead1, MemWrite1, MemOrIoToReg1, IoRead1,IoWrite1,J2,Jalr2,ByteOrWord1,
     ALUResult1, 
     imme2, addr2, rdata2_3, rd2,
-    RegWrite3,
+    RegWrite3,PCSrc, 
     MemRead2, MemWrite2, MemOrIoToReg2, IoRead2,IoWrite2,
-    rdata2_4, ALUResult2, rd3,ByteOrWord2
+    rdata2_4, ALUResult2, j_addr, rd3,ByteOrWord2
     );
     
     DataMemory datamemory(cpuclk, IoWrite2, MemWrite2, addr3, rdata2_5, rdata_m);
     
     MemOrIo memorio(
-    cpuclk,conf_i,
+    cpuclk,rst_n,conf_i,
     MemRead2,MemWrite2,IoRead2,IoWrite2,ByteOrWord2,
     ALUResult2[13:0],addr3,
     rdata_m,rdata_io,rdata_m1,rdata2_4,rdata2_5
     );
     
-//    IoWrite iowrite(rst_n,TubeCtrl,IoWrite2,rdata2_5,rdata2_6);//connect output device
-    
-//    IoRead ioread(rst_n,IoRead2,SwitchCtrl,ioread_data_switch,rdata_io);//connect input device
     
     MEMWB memwb(cpuclk, rst_n, RegWrite3, MemOrIoToReg2, rdata_m1, ALUResult2, rd3, RegWrite4, wdata, rd4);
     

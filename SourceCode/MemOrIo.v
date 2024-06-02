@@ -21,8 +21,8 @@
 //input:MemRead_i,MemWrite_i,ioRead_i,ioWrite_i,addr_i,m_rdata_i,io_rdata_i,r_rdata_i
 //output:addr_o,r_wdata_o,write_data_o
 
-module MemOrIo(clk,confirm_i, MemRead_i, MemWrite_i, ioRead_i, ioWrite_i,ByteOrWord_i,addr_i, addr_o, m_rdata_i, io_rdata_i, r_wdata_o, r_rdata_i, write_data_o);
-input clk;
+module MemOrIo(clk,rst_n,confirm_i, MemRead_i, MemWrite_i, ioRead_i, ioWrite_i,ByteOrWord_i,addr_i, addr_o, m_rdata_i, io_rdata_i, r_wdata_o, r_rdata_i, write_data_o);
+input clk,rst_n;
 input confirm_i;
 input MemRead_i; // read memory, from EXMEM
 input MemWrite_i; // write memory, from EXMEM
@@ -36,21 +36,19 @@ input[15:0] io_rdata_i; // data read from IO,16 bits
 output reg [31:0] r_wdata_o; // data to Decoder(register file)
 input[31:0] r_rdata_i; // data read from Decoder(register file)#### In pipeline it should from EXMEM
 output reg[31:0] write_data_o; // data to memory or I/O（m_wdata, io_wdata）
-//output LEDCtrl_o; // LED Chip Select
-//output SwitchCtrl_o; // Switch Chip Select 和 led 一起控制
-//output TubeCtrl_o;// Tube Chip Select
-//assign addr_o= addr_i;
-// The data wirte to register file may be from memory or io. 
-// While the data is from io, it should be the lower 16bit of r_wdata. 
-//assign r_wdata_o =(MemRead_i==1'b1)? m_rdata_i:{{16{io_rdata_i[15]}},io_rdata_i};
-// Chip select signal of Led and Switch are all active high;
-//assign SwitchCtrl_o= (ioRead_i==1'b1 && addr_i[7:4]==4'h6)? 1'b1:1'b0;
-//assign TubeCtrl_o=(ioWrite_i==1'b1 && (addr_i[7:4]==4'h7 || addr_i[7:4]==4'h8))? 1'b1:1'b0;
+
+ 
 reg MemRead,MemWrite,ioRead,ioWrite,confirm;
 reg [13:0] addr;
 reg [31:0] m_rdata,r_rdata;
 reg [15:0] io_rdata;
-always @(posedge clk)begin
+always @(posedge clk or posedge rst_n)begin
+    if(rst_n==1'b1)begin
+        MemRead<=0;MemWrite<=0;ioRead<=0;ioWrite<=0;
+        addr<=0;r_rdata<=0;
+        io_rdata<=0;
+        confirm<=0;
+    end else begin
     MemRead<=MemRead_i;MemWrite<=MemWrite_i;ioRead<=ioRead_i;ioWrite<=ioWrite_i;
     addr<=addr_i;r_rdata<=r_rdata_i;
     io_rdata<=io_rdata_i;
@@ -60,6 +58,7 @@ always @(posedge clk)begin
         2'b01:m_rdata<=m_rdata_i;
         2'b10:m_rdata<={{24{1'b0}},m_rdata_i[7:0]};
     endcase
+    end
 end
 
 always @(negedge clk) begin
