@@ -15,7 +15,6 @@ output reg [5:0]Alu_resultHigh_o
     );
     wire[31:0] operand2;
     reg [31:0]ALUResult;
-    reg [2:0]Compare;
     assign operand2 = (ALUSrc_i==1'b1)? rdata2_i:imme_i;
     // ALUControll indications:
     // add:0010
@@ -47,9 +46,9 @@ output reg [5:0]Alu_resultHigh_o
         endcase
     end
 
-    always @(negedge clk)begin
-        ALUResult_o<=ALUResult;
-        Alu_resultHigh_o<=ALUResult[13:8];
+    always @(*)begin
+        ALUResult_o=ALUResult;
+        Alu_resultHigh_o=ALUResult[13:8];
 
 //        case(Compare)
 //            3'b000: zero<=(ALUResult == 0)? 1'b1 : 1'b0;

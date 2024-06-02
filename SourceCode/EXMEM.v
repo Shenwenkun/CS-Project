@@ -35,7 +35,12 @@ output reg [4:0] rd_o,
 output reg [1:0] ByteOrWord_o
     );
     wire RegWrite;
-    reg MemRead,MemWrite,MemOrIoToReg,IoRead,IoWrite;
+    wire MemRead,MemWrite,MemOrIoToReg,IoRead,IoWrite;
+    assign MemRead=MemRead_i;
+    assign MemWrite=MemWrite_i;
+    assign MemOrIoToReg=MemOrIoToReg_i;
+    assign IoRead=IoRead_i;
+    assign IoWrite=IoWrite_i;
 //    reg [13:0] addr_jump;
     wire [31:0] rdata2;
     wire [31:0]ALUResult;
@@ -47,18 +52,18 @@ output reg [1:0] ByteOrWord_o
     always@(negedge clk or posedge rst_n) begin
         if (rst_n==1'b1)begin
 //            RegWrite<=1'b0;
-            MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
+//            MemRead<=1'b0;MemWrite<=1'b0;MemOrIoToReg<=1'b0;
 //            rdata2<=32'b0;ALUResult<=32'b0;
             rd<=4'b0;
-            IoRead<=1'b0;IoWrite<=1'b0;
+//            IoRead<=1'b0;IoWrite<=1'b0;
             ByteOrWord<=2'b0;
         end
         else begin
 //            RegWrite<=RegWrite_i;
-            MemRead<=MemRead_i;MemWrite<=MemWrite_i;MemOrIoToReg<=MemOrIoToReg_i;
+//            MemRead<=MemRead_i;MemWrite<=MemWrite_i;MemOrIoToReg<=MemOrIoToReg_i;
 //            rdata2<=rdata2_i;ALUResult<=ALUResult_i;
             rd<=rd_i;
-            IoRead<=IoRead_i;IoWrite<=IoWrite_i;
+//            IoRead<=IoRead_i;IoWrite<=IoWrite_i;
             ByteOrWord<=ByteOrWord_i;
         end
     end
