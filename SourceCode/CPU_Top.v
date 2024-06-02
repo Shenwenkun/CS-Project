@@ -24,6 +24,9 @@ module CPU_Top(
 // To be modified
 input fpga_rst,
 input fpga_clk,
+input confirm,
+input [15:0] rdata_io,
+input [31:0] result,
 
 input start, //to start the normal mode
 input rx, //with constrain PIN N5
@@ -83,7 +86,9 @@ output tx //with constrain PIN T4
    CPU cpu(
    .cpuclk(cpuclk),
    .rst(~rst), // rst is active low in CPU module
-   .start(start),
+   .conf_i(confirm),
+   .rdata_io(rdata_io),
+   .rdata2_5(result),
    .upg_rst_i(upg_rst),
    .upg_clk_i(upg_clk_o),
    .upg_wen_i(upg_wen_i),

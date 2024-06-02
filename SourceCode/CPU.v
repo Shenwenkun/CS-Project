@@ -1,7 +1,14 @@
 module CPU(
 input clk, rst,conf_i,
 input [15:0] rdata_io,
-output [31:0] rdata2_5
+output [31:0] rdata2_5,
+
+input upg_rst_i, // UPG reset (Active High)
+input upg_clk_i, // UPG clock (10MHz)
+input upg_wen_i, // UPG write enable
+input[13:0] upg_addr_i, // UPG write address
+input[31:0] upg_data_i, // UPG write data
+input upg_done_i // 1 if program finished
     );
     wire cpuclk, PCSrc;
     wire rst_n;
@@ -43,7 +50,7 @@ output [31:0] rdata2_5
     .clk_out1(cpuclk)
     );
     
-    IFetch ifetch(cpuclk, rst_n, PCSrc, j_addr, instr0, addr0);
+    IFetch ifetch(cpuclk, rst_n, PCSrc, j_addr, instr0, addr0, upg_rst_i, upg_clk_i, upg_wen_i, upg_addr_i,  upg_data_i, upg_done_i);
 
     IFID ifid(cpuclk, rst_n,PCSrc, instr0, addr0, instr1, addr1);
 
@@ -94,7 +101,7 @@ output [31:0] rdata2_5
     rdata2_4, ALUResult2, rd3,ByteOrWord2
     );
 
-    DataMemory datamemory(cpuclk, IoWrite2, MemWrite2, addr3, rdata2_5, rdata_m);
+    DataMemory datamemory(cpuclk, IoWrite2, MemWrite2, addr3, rdata2_5, rdata_m, upg_rst_i, upg_clk_i, upg_wen_i, upg_addr_i,  upg_data_i, upg_done_i);
 
     MemOrIo memorio(
     cpuclk,rst_n,conf_i,
