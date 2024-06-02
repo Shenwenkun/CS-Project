@@ -19,12 +19,13 @@ input upg_done_i // 1 if program finished
 
     /* if kickOff is 1 means CPU work on normal mode, otherwise CPU work on Uart communicationmode*/
    wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i );
+//   wire addr = (PCSrc==1'b1)?addr_i:pc;
 
 //   use a RAM, modify the name
     RAM_IF instmem (
     .clka (kickOff ? ~clk : ~upg_clk_i ),
     .wea (kickOff ? 1'b0 : upg_wen_i ),
-    .addra (kickOff ? pc : upg_addr_i ),
+    .addra (kickOff ? ((PCSrc==1'b1)?addr_i:pc) : upg_addr_i ),
     .dina (kickOff ? 32'h00000000 : upg_data_i ),
     .douta (instr_o)
     );
