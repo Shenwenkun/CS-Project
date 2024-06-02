@@ -33,7 +33,7 @@ output [7:0] light, tub_ctrl, seg_ctrl1, seg_ctrl2
     wire [31:0] result, out;
     wire up, left, right, confirm, down;
     wire sclk, cpuclk;
-    Clock clock(clk, cpuclk);
+
     DebouncerClock dbclock(clk, rst, sclk);
     Debouncer db1(sclk, rst, up_i, up);
     Debouncer db2(sclk, rst, left_i, left);
@@ -44,8 +44,8 @@ output [7:0] light, tub_ctrl, seg_ctrl1, seg_ctrl2
     Shifter shifter(sclk, rst, left, right, up, confirm, state, mode);
     Printer printer(segclk, rst, mode, state, out, tub_ctrl, seg_ctrl1, seg_ctrl2);
     InputReader inputreader(sclk, switch, confirm&(state[0]^state[1]), in);
-//    CPU_Top cputop(rst, clk, down, rx, tx);
-    CPU cpu(cpuclk, rst, confirm, {8'b00000000, in}, result);
+    CPU_Top cputop(rst, clk, confirm, {8'b00000000, in}, result, down, rx, tx);
+//    CPU cpu(cpuclk, rst, confirm, {8'b00000000, in}, result);
     OutputReader outputreader(clk, rst|~left|~up|~right, result, out);
     assign light = switch;
 endmodule
