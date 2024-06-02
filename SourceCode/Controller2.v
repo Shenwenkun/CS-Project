@@ -28,7 +28,7 @@ output IoRead_o, // 1 indicates I/O read
 output IoWrite_o, // 1 indicates I/O write
 output reg [1:0] ByteOrWord_o
     );
-        assign MemRead_o=(instr_i[6:0]==7'h03 && Alu_resultHigh_i!=6'h3C)? 1'b1:1'b0;//&& Alu_resultHigh_i!=22'h3FFFFF
+        assign MemRead_o=(instr_i[6:0]==7'h03 && Alu_resultHigh_i!=6'h3C)? 1'b1:1'b0;
         assign MemWrite_o=(instr_i[6:0]==7'h23 && Alu_resultHigh_i!=6'h3C)? 1'b1:1'b0;
         assign IoRead_o=(instr_i[6:0]==7'h03 && Alu_resultHigh_i==6'h3C)? 1'b1:1'b0;
         assign IoWrite_o=(instr_i[6:0]==7'h23 && Alu_resultHigh_i==6'h3C)? 1'b1:1'b0;

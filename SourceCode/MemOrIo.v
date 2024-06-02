@@ -38,8 +38,8 @@ input[31:0] r_rdata_i; // data read from Decoder(register file)#### In pipeline 
 output [31:0] write_data_o; // data to memory or I/O£¨m_wdata, io_wdata£©
 
 
-assign addr_o=(confirm_i==1'b0)?addr_i:14'h3C80;
-assign r_wdata_o=(MemRead_i==1'b1)?m_rdata_i:{{16{io_rdata_i[15]}},io_rdata_i};
+assign addr_o=addr_i;
+assign r_wdata_o=(MemRead_i==1'b1)?m_rdata_i:((addr_i==14'h3c80)?((confirm_i==1'b1)?32'b1:{{16{io_rdata_i[15]}},io_rdata_i}):{{16{io_rdata_i[15]}},io_rdata_i});
 assign write_data_o=((MemWrite_i==1'b1||ioWrite_i==1'b1)?r_rdata_i:32'h00000000);
  
 //reg MemRead,MemWrite,ioRead,ioWrite;
